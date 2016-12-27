@@ -1,5 +1,7 @@
+var CacheName = 'CineList';
+
 self.addEventListener('install', function(e) {
-	e.waitUntil( caches.open('CineList').then(function(cache) {
+	e.waitUntil( caches.open(CacheName).then(function(cache) {
 		return cache.addAll([
 			'/',
 			'/index.html',
@@ -27,8 +29,14 @@ self.addEventListener('install', function(e) {
 
 self.addEventListener('fetch', function(event) {
   event.respondWith(
-    caches.match(event.request).then(function(response) {
-      return response || fetch(event.request);
+    caches.open(CacheName).then(function(cache) {
+      return cache.match(event.request).then(function(response) {
+        var fetchPromise = fetch(event.request).then(function(networkResponse) {
+          cache.put(event.request, networkResponse.clone());
+          return networkResponse;
+        })
+        return response || fetchPromise;
+      })
     })
   );
 });
