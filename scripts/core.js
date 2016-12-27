@@ -319,6 +319,24 @@ var __cinelist = (function(){
 
 	}
 
+	function searchLocation(input, callback){
+
+		var reqQuery = APIRoot + "/search/cinemas/location/" + input;
+
+		jQuery.ajax({
+			type : "GET",
+			url : reqQuery,
+			success : callback,
+			cache: false,
+			error : function(err){
+				console.error(err);
+				loading.hide();
+				dialog.error("Sorry, Something went wrong");
+			}
+		});		
+
+	}
+
 	var lastPress = 0,
 		filterInterval = undefined,
 		lastSearch = undefined;
@@ -358,7 +376,7 @@ var __cinelist = (function(){
 
 	}
 
-	function handleSubmission(searchQuery){
+	/*function handleSubmission(searchQuery){
 
 		locationInput[0].blur();
 
@@ -454,6 +472,82 @@ var __cinelist = (function(){
 				window.history.pushState({}, "CineList | " + searchQuery, "/?place=" + searchQuery);
 
 				searchPostCode(selectedTown.lat, selectedTown.lon, postCodeAcquired);
+
+			});
+
+		} else {
+			window.history.pushState({}, "CineList | Results", "/?latitude=" + searchQuery.latitude + "&longitude=" + searchQuery.longitude);
+			searchPostCode(searchQuery.latitude, searchQuery.longitude, postCodeAcquired);
+		}
+
+	}*/
+
+	function handleSubmission(searchQuery){
+
+		locationInput[0].blur();
+
+		loading.display();
+		dialog.hide(0);
+		document.getElementById('results').innerHTML = "";
+
+		document.getElementById('helper').setAttribute('class', 'inactive');
+
+
+
+		if(searchQuery.latitude === undefined){
+			// Not a position object, it's a string
+
+			searchLocation(searchQuery, function(res){
+
+				console.log(res);
+
+				if(res.length === 0){
+					console.error("Not a valid place name");
+					loading.hide();
+					dialog.error("Sorry, couldn't find that place");
+					return false;
+				}
+
+				console.log(res);
+
+				var cinemas = res.cinemas;
+
+				if(cinemas.length > 10){
+					cinemas.length = 10;
+				} else if(cinemas.length === 0){
+					loading.hide();
+					dialog.error("Sorry, Couldn't find any cinemas");
+				}
+
+				var listings = [],
+					complete = 0;
+
+				for(var c = 0; c < cinemas.length; c += 1){
+					(function(cinema){
+
+						var times = getShowtimes(cinema.id, function(res){
+							console.log(res);
+							if(res !== false){
+								listings.push({
+									cinema : cinema,
+									times : res.listings
+								});
+							}
+
+							complete += 1;
+
+							if(complete == cinemas.length - 1){
+								console.log(listings);
+								displayListings(listings);
+								loading.hide();
+							}
+
+						});
+
+					})(cinemas[c]);
+				}
+
+				window.history.pushState({}, "CineList | " + searchQuery, "/?place=" + searchQuery);
 
 			});
 
