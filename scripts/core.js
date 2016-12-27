@@ -9,8 +9,7 @@ var __cinelist = (function(){
 		selectedPlace = undefined,
 		showTimesResults = undefined;
 
-	// var APIRoot = "https://api.cinelist.co.uk";
-	var APIRoot = "http://localhost:7890";
+	var APIRoot = "https://api.cinelist.co.uk";
 
 	var startTime = undefined,
 		endTime = undefined;
