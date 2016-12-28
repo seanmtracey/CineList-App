@@ -22,6 +22,27 @@ var __cinelist = (function(){
 
 	}
 
+	function updateOnlineStatus(){
+		document.body.dataset.online = navigator.onLine;
+	}
+
+	function detectNetworkStatus(){
+
+		setInterval(function(){
+			jQuery.ajax({
+				type : "GET",
+				url : APIRoot + '/__gtg',
+				dataType : "json",
+				crossDomain : true,
+				cache : true,
+				error : function(){
+					updateOnlineStatus();
+				}
+			});
+		}, 5000);
+
+	}
+
 	var loading = (function(){
 
 		var el = document.getElementById('loading');
@@ -86,7 +107,6 @@ var __cinelist = (function(){
 
 		console.log(listings);
 
-
 		var listings = listings;
 
 		listings.sort(function(a,b){
@@ -133,21 +153,6 @@ var __cinelist = (function(){
 				cineFrag.appendChild(cinemaName);
 
 			for(var g = 0; g < thisCinemaData.times.length; g += 1){
-
-				/*thisCinemaData.times.sort(function(a,b){
-
-					var titleA = a.title[0].toLowerCase(),
-						titleB = b.title[0].toLowerCase();
-
-					if(titleA < titleB){
-						return -1;
-					} else {
-						return 1;
-					}
-
-					return 0;
-
-				});*/
 
 				var	movieHolder = document.createElement('li'),
 					movieTitle = document.createElement('h3'),
@@ -208,8 +213,6 @@ var __cinelist = (function(){
 
 				document.getElementById('results').appendChild(cineFrag);
 
-				//document.body.appendChild(cineFrag);
-
 			}
 
 			filterResults.setAttribute('class', '');
@@ -223,37 +226,9 @@ var __cinelist = (function(){
 
 	}
 
-	function getShowtimes(cinemaID, callback){
-		//http://162.243.202.96:9191/echo/cinematimes/7174
-
-		console.log(cinemaID);
-
-		// var getListingsURL = "http://cinelist.co.uk/echo/cinematimes/" + cinemaID;
-
-		var getListingsURL = APIRoot + "/get/times/cinema/" + cinemaID;
-
-		jQuery.ajax({
-			type : "GET",
-			url : getListingsURL,
-			success : callback,
-			error : function(err){
-				console.log(err);
-				callback(false);
-				//loading.hide();
-				//dialog.error("Sorry, something went wrong");
-			},
-			dataType : "json",
-			crossDomain : true,
-			cache : false
-		});
-
-	}	
-
 	function getMultipleShowtimes(CSIDs, callback){
 
-		console.log(CSIDs);
-
-		// var getListingsURL = "http://cinelist.co.uk/echo/cinematimes/" + cinemaID;
+		// console.log(CSIDs);
 
 		var getListingsURL = APIRoot + "/get/times/many/" + CSIDs;
 
@@ -264,87 +239,22 @@ var __cinelist = (function(){
 			error : function(err){
 				console.log(err);
 				callback(false);
-				//loading.hide();
-				//dialog.error("Sorry, something went wrong");
+				loading.hide();
+				dialog.error("Sorry, something went wrong");
+				updateOnlineStatus();
 			},
 			dataType : "json",
 			crossDomain : true,
-			cache : false
+			cache : true
 		});
 		
 	}
 
-	function searchCinemas(postcode, callback){
-
-		// var earl = "http://cinelist.co.uk/echo/searchcinema/" + encodeURIComponent(postcode)
-
-		var earl = APIRoot + "/search/cinemas/postcode/" + postcode;
-
-		console.log(earl);
-
-		jQuery.ajax({
-			type : "GET",
-			url : earl,
-			success : callback,
-			error : function(err){
-				console.log(err);
-				loading.hide();
-				dialog.error("Sorry, Something went wrong");
-			},
-			dataType : "json",
-			crossDomain : true,
-			cache : false
-		});
-
-	}
-
-	function searchPostCode(lat, lon, callback){
-
-		console.log(lat, lon);
-	
-		lat = parseFloat(lat).toFixed(3);
-		lon = parseFloat(lon).toFixed(3);
-
-		var postCodeQuery = "https://api.postcodes.io/postcodes?lon=" + lon + "&lat=" + lat;
-
-		console.log(postCodeQuery);
-
-		jQuery.ajax({
-			type : "GET",
-			url : postCodeQuery,
-			success : callback,
-			error : function(err){
-				console.log(err);
-				loading.hide();
-				dialog.error("Sorry, Something went wrong");
-			}
-		});
-
-	}
-
-	function searchTowns(town, callback){
-
-		console.log(town);
-
-		var reqQuery = "https://nominatim.openstreetmap.org/search?q=" + town + "&countrycodes=gb&format=json&limit=10";
-
-		console.log(reqQuery);
-
-		jQuery.ajax({
-			type : "GET",
-			url : reqQuery,
-			success : callback,
-			cache: false,
-			error : function(err){
-				console.error(err);
-				loading.hide();
-				dialog.error("Sorry, Something went wrong");
-			}
-		});
-
-	}
-
 	function searchLocation(input, callback){
+
+		if(input !== undefined && input.latitude === undefined){
+			input = input.toLowerCase();
+		}
 
 		var reqQuery =  input.latitude === undefined ? APIRoot + "/search/cinemas/location/" + input : APIRoot + "/search/cinemas/coordinates/" + input.latitude + "/" + input.longitude;
 
@@ -352,11 +262,12 @@ var __cinelist = (function(){
 			type : "GET",
 			url : reqQuery,
 			success : callback,
-			cache: false,
+			cache: true,
 			error : function(err){
 				console.error(err);
 				loading.hide();
 				dialog.error("Sorry, Something went wrong");
+				updateOnlineStatus();
 			}
 		});		
 
@@ -487,8 +398,6 @@ var __cinelist = (function(){
 
 	function checkForRef(){
 
-		//console.log(window)
-
 		var location = window.location.href,
 			query = location.split('?')[1],
 			params = undefined,
@@ -557,6 +466,7 @@ var __cinelist = (function(){
 					console.log(err);
 					loading.hide();
 					dialog.error("Sorry, unable to get your position");
+					updateOnlineStatus();
 				});
 
 			}, false);
@@ -601,6 +511,11 @@ var __cinelist = (function(){
 		checkForRef();
 
 		initialised = true;
+
+		window.addEventListener('online',  updateOnlineStatus);
+		window.addEventListener('offline', updateOnlineStatus);
+
+		detectNetworkStatus();
 
 	}
 

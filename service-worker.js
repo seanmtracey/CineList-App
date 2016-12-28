@@ -10,22 +10,20 @@ self.addEventListener('install', function(e) {
 			'/?homescreen=1',
 			'/styles.css',
 			'/icon/144.png',
+			'/assets/images/logo_small_opaque.jpg',
 			'/windows.css',
 			'/scripts/core.js',
 			'/scripts/libraries/jquery.min.js',
-			'/assets/images/loading.png'
+			'/assets/images/loading.png',
+			'/service-worker.js',
+			'/assets/images/go.png',
+			'/assets/images/pointer.png',
+			'/assets/images/pointer_up.png',
+			'/assets/images/logo_small_opaque.jpg',
+			'https://cdn.polyfill.io/v2/polyfill.min.js'
 		]);
 	}));
 });
-
-/*self.addEventListener('fetch', function(event) {
- console.log(event.request.url);
- event.respondWith(
-   caches.match(event.request).then(function(response) {
-     return response || fetch(event.request);
-   })
- );
-});*/
 
 self.addEventListener('fetch', function(event) {
   event.respondWith(

@@ -6,6 +6,7 @@
 <link rel="shortcut icon" href="favicon.png">
 <link rel="stylesheet" href="styles.css" type="text/css" />
 <link rel="stylesheet" href="windows.css" type="text/css" />
+<script src="https://cdn.polyfill.io/v2/polyfill.min.js"></script>
 <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
 <meta name="description" content="Cinema websites are rubbish. CineList makes it easy to get local cinema showtimes across the UK.">
 
@@ -20,9 +21,6 @@
 <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/icon/72.png" />
 <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/icon/114.png" />
 <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/icon/144.png" />
-
-<script src="//use.typekit.net/imt5yec.js"></script>
-<script>try{Typekit.load();}catch(e){}</script>
 
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#000000" />
@@ -103,8 +101,10 @@
 </div>
 
 <div id="madeby">
-	<a href="http://sean.mtracey.org" target="_blank">I made this.</a>
+	<a href="http://sean.mtracey.org" target="_blank" rel="noopener">I made this.</a>
 </div>
+
+<div id="offline">Offline Mode<br><span>Displayed results may be incorrect</span></div>
 
 <script src="scripts/libraries/jquery.min.js"></script>
 <script src="scripts/core.js"></script>
@@ -131,6 +131,9 @@
   ga('send', 'pageview');
 
 </script>
+
+<script src="//use.typekit.net/imt5yec.js"></script>
+<script>try{Typekit.load();}catch(e){}</script>
 
 </body>
 </html>
