@@ -230,7 +230,9 @@ var __cinelist = (function(){
 
 		// console.log(CSIDs);
 
-		var getListingsURL = APIRoot + "/get/times/many/" + CSIDs;
+		var now = new Date();
+
+		var getListingsURL = APIRoot + "/get/times/many/" + CSIDs + "?d=" + now.getDate() + "-" + (now.getMonth() + 1) + "-" + now.getUTCFullYear();
 
 		jQuery.ajax({
 			type : "GET",
