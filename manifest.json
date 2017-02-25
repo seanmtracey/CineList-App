@@ -14,5 +14,6 @@
         "type": "image/png"
       }],
   "background_color": "#FFFFFF",
-  "theme_color": "#000000"
+  "theme_color": "#000000",
+  "description" : "Cinema websites are rubbish. CineList makes it easy to get local cinema showtimes across the UK."
 }

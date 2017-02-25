@@ -122,7 +122,18 @@ var __cinelist = (function(){
 
 		});
 
-		console.log(listings);
+		listings.forEach(function(cinema){
+			cinema.times.sort(function(a,b){
+
+				if(a.title.toLowerCase() < b.title.toLowerCase()){
+					return -1;
+				} else {
+					return 1;
+				}
+
+
+			});
+		});
 
 		document.getElementById('results').innerHTML = "";
 
