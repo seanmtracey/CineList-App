@@ -38,15 +38,22 @@
 
 		return cinemas.map(function(cinema){
 
-			for(var x = 0; x < times.length; x += 1){
-				if(times[x].cinema === cinema.id){
-					cinema.listings = times[x].listings;
-					times.splice(x, 1);
-					return cinema;
+				for(var x = 0; x < times.length; x += 1){
+					if(times[x] === null){
+						return null;
+					}
+					if(times[x].cinema === cinema.id){
+						cinema.listings = times[x].listings;
+						times.splice(x, 1);
+						return cinema;
+					}
 				}
-			}
 
-		});
+			})
+			.filter(function(item){
+				return item !== null;
+			})
+		;
 
 	}
 
@@ -156,6 +163,7 @@
 					
 					return getManyCinemaTimesById(cinemaIDs, offset)
 						.then(function(listingsData){
+							debugger;
 							return joinListOfCinemasWithListings(cinemaData.cinemas, listingsData.results);
 						})
 					;
