@@ -7,6 +7,7 @@ var __cinelist = (function(){
 	var prevent = function(e){e.preventDefault();e.stopImmediatePropagation()};
 
 	var searchForm = document.querySelector('#search');
+	var timesContainer = document.querySelector('#timesContainer');
 
 	function wasResponseGood(response){
 		
@@ -51,7 +52,6 @@ var __cinelist = (function(){
 		shouldSort = shouldSort || false;
 
 		var timesDocumentFragment = document.createDocumentFragment();
-		var mainCinemaContainer = document.createElement('div');
 
 		cinemasWithTimes.forEach(function(cinema){
 			
@@ -59,11 +59,14 @@ var __cinelist = (function(){
 			var cinemaTitle = document.createElement('h2');
 			var cinemaDistance = document.createElement('span');
 
+			cinemaContainer.classList.add('cinema');
+
 			cinemaTitle.textContent = cinema.name;
-			cinemaDistance.textContent = cinema.distance;
+			cinemaDistance.textContent = '(' + cinema.distance + 'miles)';
+
+			cinemaTitle.appendChild(cinemaDistance);
 
 			cinemaContainer.appendChild(cinemaTitle);
-			cinemaContainer.appendChild(cinemaDistance);
 
 			cinema.listings.forEach(function(listing){
 
@@ -71,6 +74,7 @@ var __cinelist = (function(){
 				var listingTitle = document.createElement('h3');
 				var listingTimesContainer = document.createElement('ol');
 
+				listingContainer.classList.add('listing');
 				listingTitle.textContent = listing.title;
 				
 				listing.times.forEach(function(time){
@@ -86,13 +90,13 @@ var __cinelist = (function(){
 				cinemaContainer.appendChild(listingContainer);
 			});
 
-			mainCinemaContainer.appendChild(cinemaContainer);
+			timesDocumentFragment.appendChild(cinemaContainer);
 
 		});
 
-		timesDocumentFragment.appendChild(mainCinemaContainer);
-		document.body.appendChild(timesDocumentFragment);
-
+		// timesDocumentFragment.appendChild(mainCinemaContainer);
+		// timesContainer.appendChild(timesDocumentFragment);
+		return timesDocumentFragment;
 	}
 
 	function searchForLocation(location){
@@ -140,7 +144,8 @@ var __cinelist = (function(){
 						})
 						.then(function(cinemasWithTimes){
 							console.log(cinemasWithTimes);
-							generateViewFromData(cinemasWithTimes);
+							timesContainer.innerHTML = "";
+							timesContainer.appendChild(generateViewFromData(cinemasWithTimes));
 							console.timeEnd('cinemaTimes');
 						})
 					;

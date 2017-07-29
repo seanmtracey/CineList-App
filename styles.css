@@ -3,6 +3,7 @@
 
 *{
 	-webkit-tap-highlight-color: rgba(0,0,0,0);
+	box-sizing: border-box;
 	/*-webkit-transform: translateZ(0);*/
 	/*-webkit-perspective: 1000;*/
 	/*-webkit-backface-visibility: hidden;*/
@@ -24,6 +25,7 @@ h1,h2,h3,h4,h5,h6{
 	font-family: "proxima-nova", 'Proxima Nova', sans-serif;
 	margin: 0;
 	padding: 0;
+	line-height: 1.5em;
 }
 
 html{
@@ -32,11 +34,12 @@ html{
 	background-color:white;
 	background-position:center 0px;
 	background-size:100%;
-
+	font-size: 14px;
 }
 
 body{
 	font-family: "proxima-nova", 'Proxima Nova', Arial, Helvetica, sans-serif;
+	/*font-family: sans-serif;*/
 	font-size: 15px;
 	margin:0px;
 	background-attachment: scroll;
@@ -44,4 +47,85 @@ body{
 	width:100%;
 	height:100%;
 	box-sizing:border-box;
+}
+
+form{
+	padding: 1em;
+}
+
+form input[type="text"]{
+	font-weight: 600;
+	font-size: 1em;
+	padding: 0.5em 0.3em;
+	border: 2px solid black;
+	border-width: 0 0 1px 0;
+	outline: none;
+	width: 100%;
+}
+
+#timesContainer h2{
+	font-size: 18px;
+	display: flex;
+	align-items: center;
+	padding: 0.5em;
+	background: black;
+	color: white;
+	margin-bottom: 1em;
+}
+
+#timesContainer h2 span{
+	font-size: 10px;
+	margin-left: 1em;
+}
+
+#timesContainer .listing{
+	padding: 0 1em;
+}
+
+#timesContainer .listing ol{
+    padding: 0;
+    margin: 0;
+    display: flex;
+    list-style-type: none;
+    flex-wrap: wrap;
+    padding-top: 0.8em;
+    padding-bottom: 1em;
+}
+
+#timesContainer .listing ol li{
+	display: block;
+	width: 50px;
+	margin-bottom: 1em;
+}
+
+.dayoffset{
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	display: flex;
+	width: 100%;
+	overflow-x: scroll;
+	padding: 0.8em;
+	border-top: 1px solid black;
+	align-items: center;
+}
+
+.dayoffset a{
+	display: block;
+	color: #3a3a3a;
+	margin-right: 2em;
+	text-decoration: none;
+	font-weight: 200;
+}
+
+.dayoffset a.activeDay{
+	background: black;
+    color: white;
+    padding: 0.4em 0.7em;
+    display: flex;
+    align-content: center;
+    justify-content: center;
+    flex-direction: row;
+    border-radius: 3px;
+	font-weight: 600;
 }
