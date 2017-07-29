@@ -26,17 +26,17 @@ self.addEventListener('install', function(e) {
 
 self.addEventListener('fetch', function(event) {
   event.respondWith(
-    caches.open(CacheName).then(function(cache) {
-      return cache.match(event.request).then(function(cachedResponse) {
-        var fetchPromise = fetch(event.request).then(function(networkResponse) {
-          cache.put(event.request, networkResponse.clone());
-          return networkResponse;
-        })
+	caches.open(CacheName).then(function(cache) {
+	  return cache.match(event.request).then(function(cachedResponse) {
+		var fetchPromise = fetch(event.request).then(function(networkResponse) {
+		  cache.put(event.request, networkResponse.clone());
+		  return networkResponse;
+		})
 				console.log(cachedResponse);
 				// If it's a request to the API
 				// try to get it from the network
 				// if that fails, send the cached version
-				// if there is one.	
+				// if there is one. 	
 				if(event.request.url.indexOf('api.cinelist.co.uk') > -1){
 
 					return fetchPromise
@@ -52,7 +52,7 @@ self.addEventListener('fetch', function(event) {
 
 				return cachedResponse || fetchPromise;
 
-      })
-    })
+	  })
+	})
   );
 });
