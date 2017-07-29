@@ -10,7 +10,7 @@
 	var searchForm = document.querySelector('#search');
 	var geoTrigger = searchForm.querySelector('#geolocation');
 	var dayoffsetContainer = document.querySelector('.dayoffset');
-	var dayOffsetButtons = dayoffsetContainer.querySelectorAll('*[data-offset]');
+	var dayOffsetButtons = Array.from( dayoffsetContainer.querySelectorAll('*[data-offset]') );
 	var timesContainer = document.querySelector('#timesContainer');
 
 	var currentLocation = '';
@@ -329,6 +329,10 @@
 		searchForm.addEventListener('submit', function(e){
 			prevent(e);
 			
+			if(this[0].value === ""){
+				return;
+			}
+
 			this[0].blur();
 			this.dataset.firstload = "false";
 			home.dataset.visible = "false";
@@ -408,13 +412,20 @@
 
 		dayOffsetButtons.forEach(function(offsetBtn){
 
-			var dayInt = parseInt(offsetBtn.dataset.offset) + today;
+			var offset = parseInt(offsetBtn.dataset.offset);
+			var dayInt = offset + today;
 			
 			if(dayInt >= days.length){
 				dayInt = dayInt - 7;
 			}
-			
-			offsetBtn.textContent = days[dayInt];
+
+			if(offset === 0){
+				offsetBtn.textContent = 'Today';				
+			} else if(offset === 1){
+				offsetBtn.textContent = 'Tomorrow';
+			} else {
+				offsetBtn.textContent = days[dayInt];
+			}
 
 			offsetBtn.addEventListener('click', function(e){
 				prevent(e);

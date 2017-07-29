@@ -73,9 +73,10 @@ body{
 
 #home #container{
 	position: fixed;
-	top: 20vh;
+	top: 15vh;
 	padding: 1em;
 	width: 100%;
+	text-align: center;
 }
 
 #home #container img{
@@ -90,34 +91,55 @@ body{
 }
 
 #search{
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
 	width: 100%;
 	position: fixed;
 	top: 0;
 	transform: translateY(0);
 	z-index: 1000;
 	background: white;
-	border-bottom: 1px solid black;
+	border-bottom: 1px solid white;
 	transition: transform 0.2s ease-in;
-	
+	background: black;
 }
 
 #search[data-firstload="true"]{
-	transform: translateY(40vh);
-    border-bottom: 0px solid black;
+	transform: translateY(45vh);
 }
 
 form{
 	padding: 1em;
 }
 
-form input[type="text"]{
+form#search input[type="text"]{
 	font-weight: 400;
-	font-size: 1em;
-	padding: 0.5em 0.3em;
-	border: 2px solid black;
-	border-width: 0 0 1px 0;
+    font-size: 1em;
+    padding: 0.5em 0.3em;
+    border: 2px solid black;
+    border-width: 0 0 1px 0;
+    outline: none;
+    width: 100%;
+    background: black;
+    color: white;
+}
+
+form#search input[type="text"]:focus{
+	background-image: url(/assets/images/search.png);
+	background-size: auto 20px;
+	background-position: 100% 50%;
+	background-repeat: no-repeat;
+}
+
+form#search input[type="submit"]{
+	position: absolute;
+    right: 0;
+    background: transparent;
+    border: 0px solid transparent;
+    width: 60px;
+    height: 100%;
 	outline: none;
-	width: 100%;
 }
 
 #geolocation{
@@ -126,12 +148,18 @@ form input[type="text"]{
 	text-decoration: none;
 	margin-top: 0.5em;
 	display: block;
-	padding: 0 0.3em 0;
 	cursor: pointer;
+	font-size: 10px;
+	text-align: center;
+	margin-right: 1em;
+}
+
+#geolocation img{
+	height: 20px;
 }
 
 #timesContainer{
-    padding-top: 85px;
+    padding-top: 65px;
     padding-bottom: 30%;
 }
 
@@ -246,4 +274,25 @@ form input[type="text"]{
 @-o-keyframes spinAnimation{
 	0% {-o-transform: rotateZ(0deg);}
 	100% {-o-transform: rotateZ(360deg);}
+}
+
+@media all and (min-width: 768px){
+	
+	#timesContainer .cinema{
+		display: flex;
+		flex-wrap: wrap;
+	}
+
+	#timesContainer h2 {
+		width: 100%;
+	}
+
+	#timesContainer .listing{
+		width: 300px;
+	}
+
+	#timesContainer .listing h3{
+		padding-left: 0.5em;
+	}
+
 }

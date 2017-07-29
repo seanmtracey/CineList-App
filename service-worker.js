@@ -15,9 +15,8 @@ self.addEventListener('install', function(e) {
 			'/scripts/libraries/jquery.min.js',
 			'/assets/images/loading.png',
 			'/service-worker.js',
-			'/assets/images/go.png',
-			'/assets/images/pointer.png',
-			'/assets/images/pointer_up.png',
+			'/assets/images/search.png',
+			'/assets/images/geo.png',
 			'/assets/images/logo_small_opaque.jpg',
 			'https://cdn.polyfill.io/v2/polyfill.min.js'
 		]);
