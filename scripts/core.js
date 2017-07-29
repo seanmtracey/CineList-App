@@ -6,6 +6,7 @@
 
 	var prevent = function(e){e.preventDefault();e.stopImmediatePropagation()};
 
+	var home = document.querySelector('#home');
 	var searchForm = document.querySelector('#search');
 	var geoTrigger = searchForm.querySelector('#geolocation');
 	var dayoffsetContainer = document.querySelector('.dayoffset');
@@ -92,9 +93,7 @@
 		});
 	}
 
-	function generateViewFromData(cinemasWithTimes, shouldSort){
-
-		shouldSort = shouldSort || false;
+	function generateViewFromData(cinemasWithTimes, offset){
 
 		var timesDocumentFragment = document.createDocumentFragment();
 
@@ -113,6 +112,18 @@
 
 			cinemaContainer.appendChild(cinemaTitle);
 
+			cinema.listings.sort( function(a, b){
+				if(a.title > b.title){
+					return 1
+				} else {
+					return -1;
+				}
+			});
+
+			var d = new Date(),
+				thisHour = d.getHours(),
+				thisMinute = d.getMinutes();
+
 			cinema.listings.forEach(function(listing){
 
 				var listingContainer = document.createElement('div');
@@ -122,10 +133,44 @@
 				listingContainer.classList.add('listing');
 				listingTitle.textContent = listing.title;
 				
+				var setNext = false;
+
 				listing.times.forEach(function(time){
 
 					var timeLi = document.createElement('li');
 					timeLi.textContent = time;
+
+					if(offset === 0){
+						var theTime = time.split(":");
+						var canCatch = undefined;
+
+						if(thisHour < parseInt(theTime[0])){
+							canCatch = true
+						} else if(thisHour == parseInt(theTime[0]) && thisMinute < parseInt(theTime[1])){
+							canCatch = true;
+						} else {
+							canCatch = false;
+						}
+
+						if(!setNext && canCatch){
+							timeLi.setAttribute('class', 'nextTime')
+							setNext = true;
+						}
+
+						if(!canCatch){
+							timeLi.setAttribute('class','missed');
+						}
+
+					} else {
+
+						if(!setNext){
+							timeLi.setAttribute('class', 'nextTime')
+							setNext = true;
+						}
+
+					}
+
+
 					listingTimesContainer.appendChild(timeLi);
 
 				});
@@ -285,6 +330,8 @@
 			prevent(e);
 			
 			this[0].blur();
+			this.dataset.firstload = "false";
+			home.dataset.visible = "false";
 
 			currentLocation = this[0].value;
 			currentLocationIsPostcode = false;
@@ -297,7 +344,7 @@
 				.then(function(cinemasWithTimes){
 					console.log(cinemasWithTimes);
 					timesContainer.innerHTML = "";
-					timesContainer.appendChild(generateViewFromData(cinemasWithTimes));
+					timesContainer.appendChild(generateViewFromData(cinemasWithTimes, 0));
 					window.__cinelist.loading.hide();
 					dayoffsetContainer.dataset.active = "true";
 					
@@ -310,7 +357,9 @@
 			prevent(e);
 			console.log(e);
 
+			home.dataset.visible = "false";
 			searchForm[0].value = "";
+			searchForm.dataset.firstload = "false";
 
 			resetDayOffsetButtons();
 			dayOffsetButtons[0].classList.add('activeDay');
@@ -319,7 +368,6 @@
 			window.__cinelist.loading.show();
 			dayoffsetContainer.dataset.active = "false";
 			
-
 			dayoffsetContainer.dataset.active = "false";
 
 			getGeolocation()
@@ -330,7 +378,7 @@
 						.then(function(cinemasWithTimes){
 							console.log(cinemasWithTimes);
 							timesContainer.innerHTML = "";
-							timesContainer.appendChild(generateViewFromData(cinemasWithTimes));
+							timesContainer.appendChild(generateViewFromData(cinemasWithTimes, 0));
 							window.__cinelist.loading.hide();
 							dayoffsetContainer.dataset.active = "true";
 						})
@@ -375,7 +423,8 @@
 
 				offsetBtn.classList.add('activeDay');
 				
-				console.log(parseInt(this.dataset.offset));
+				var dateOffset = parseInt(this.dataset.offset);
+				console.log(dateOffset);
 
 				var appropriateSearch = currentLocationIsPostcode ? getCinemasAndTimesFromPostcode : getCinemasAndTimesFromLocation;
 				
@@ -386,7 +435,7 @@
 					.then(function(cinemasWithTimes){
 						console.log(cinemasWithTimes);
 						timesContainer.innerHTML = "";
-						timesContainer.appendChild(generateViewFromData(cinemasWithTimes));
+						timesContainer.appendChild(generateViewFromData(cinemasWithTimes, dateOffset));
 						window.__cinelist.loading.hide();
 						dayoffsetContainer.dataset.active = "true";						
 					})
