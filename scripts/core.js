@@ -2,543 +2,106 @@ var __cinelist = (function(){
 
 	'use strict';
 
-	var initialised = false,
-		locationInput = undefined,
-		geotrigger = undefined,
-		filterInput = undefined,
-		selectedPlace = undefined,
-		showTimesResults = undefined;
-
 	var APIRoot = "https://api.cinelist.co.uk";
 
-	var startTime = undefined,
-		endTime = undefined;
+	var prevent = function(e){e.preventDefault();e.stopImmediatePropagation()};
 
-	function isWindows(cb){
+	var searchForm = document.querySelector('#search');
 
-		if (navigator.appVersion.indexOf("Win") != -1){
-			cb();
-		}
-
-	}
-
-	function updateOnlineStatus(){
-		document.body.dataset.online = navigator.onLine;
-	}
-
-	function detectNetworkStatus(){
-
-		setInterval(function(){
-			jQuery.ajax({
-				type : "GET",
-				url : APIRoot + '/__gtg',
-				dataType : "json",
-				crossDomain : true,
-				cache : true,
-				error : function(){
-					updateOnlineStatus();
-				}
-			});
-		}, 5000);
-
-	}
-
-	var loading = (function(){
-
-		var el = document.getElementById('loading');
-
-		function displayLoading(){
-			el.setAttribute('class', 'spin');
-			el.setAttribute('data-is-loading', 'true');
-		}
-
-		function hideLoading(){
-			el.setAttribute('class', '');
-			el.setAttribute('data-is-loading', 'false');
-		}
-
-		return{
-			display : displayLoading,
-			hide : hideLoading
-		};
-
-	})();
-
-	var dialog = (function(){
-
-		var el = document.getElementById('dialog');
-
-		function displayDialog(message, isError){
-
-			el.textContent = message;
-
-			if(isError){
-				el.setAttribute('class', 'error');
-			} else {
-				el.setAttribute('class', '');
-			}
-
-		}
-
-		function hideDialog(time){
-			
-			setTimeout(function(){
-				el.setAttribute('class', 'inactive');
-				el.textContent = "";
-			}, time);
-			
-
-		}
-
-		function handleError(message){
-			displayDialog(message, true);
-			hideDialog(3000);
-		}
-
-		return{
-			display : displayDialog,
-			hide : hideDialog,
-			error : handleError
-		};
-
-	})();
-
-	function displayListings(listings){
-
-		console.log(listings);
-
-		var listings = listings;
-
-		listings.sort(function(a,b){
-
-			var disA = parseFloat(a.cinema.distance),
-				disB = parseFloat(b.cinema.distance);
-
-			if(disA < disB){
-				return -1;
-			} else {
-				return 1;
-			}
-
-		});
-
-		listings.forEach(function(cinema){
-			cinema.times.sort(function(a,b){
-
-				if(a.title.toLowerCase() < b.title.toLowerCase()){
-					return -1;
-				} else {
-					return 1;
-				}
-
-
-			});
-		});
-
-		document.getElementById('results').innerHTML = "";
-
-		var cineFrag = document.createDocumentFragment();
-
-		var d = new Date(),
-			thisHour = d.getHours(),
-			thisMinute = d.getMinutes();
-
-		for(var x = 0; x < listings.length; x += 1){
-
-			var thisCinemaData = listings[x];
-
-			var cinemaName = document.createElement('h1'),
-				cinemaDistance = document.createElement('span'),
-				results = document.createElement('ul');
-
-				cinemaName.textContent = thisCinemaData.cinema.name.trim().replace(/,+$/, "").replace(/ , /g, ', ');
-				cinemaDistance.textContent = "(" + thisCinemaData.cinema.distance + " miles)"
-
-				// Location Map
-				// https://www.google.co.uk/maps/place/Cineworld Luton,The Galaxy,Bridge Street,Luton,Luton,LU1 2NB
-
-				if(thisCinemaData.times.length === 0){
-					continue;
-				}
-				cinemaName.appendChild(cinemaDistance);
-				cineFrag.appendChild(cinemaName);
-
-			for(var g = 0; g < thisCinemaData.times.length; g += 1){
-
-				var	movieHolder = document.createElement('li'),
-					movieTitle = document.createElement('h3'),
-					timesHolder = document.createElement('div');
-
-				if(thisCinemaData.times[g].title.length > 30){
-					var shortened = thisCinemaData.times[g].title.slice(0, 29);
-					movieTitle.setAttribute('class','shortened');
-					movieTitle.textContent = shortened + "...";
-				} else {
-					movieTitle.textContent = thisCinemaData.times[g].title;	
-				}
-
-				movieHolder.setAttribute('data-movie-title', thisCinemaData.times[g].title);
-				
-				timesHolder.setAttribute('class', 'times');
-
-				var setNext = false;
-
-				for(var j = 0; j < thisCinemaData.times[g].times.length; j += 1){
-
-					var aTime = document.createElement('a'),
-						theTime = thisCinemaData.times[g].times[j].split(":"),
-						canCatch = undefined;
-
-					aTime.textContent = theTime.join(":");
-
-					if(thisHour < parseInt(theTime[0])){
-						canCatch = true
-					} else if(thisHour == parseInt(theTime[0]) && thisMinute < parseInt(theTime[1])){
-						canCatch = true;
-					} else {
-						canCatch = false;
-					}
-
-					if(!setNext && canCatch){
-						aTime.setAttribute('class', 'next')
-						setNext = true;
-					}
-
-					if(!canCatch){
-						aTime.setAttribute('class','missed');
-					}
-
-					if(j === thisCinemaData.times[g].times.length - 1 && !setNext){
-						movieHolder.setAttribute('data-all-missed', 'true');
-					}
-
-					timesHolder.appendChild(aTime);
-
-				}
-
-				movieHolder.appendChild(movieTitle);
-				movieHolder.appendChild(timesHolder);
-
-				results.appendChild(movieHolder);
-				cineFrag.appendChild(results);
-
-				document.getElementById('results').appendChild(cineFrag);
-
-			}
-
-			filterResults.setAttribute('class', '');
-			filterResults.reset();
-
-			setTimeout(function(){
-				document.getElementById('goArrow').setAttribute('class', 'inactive');
-			}, 10);
-
-		}
-
-	}
-
-	function getMultipleShowtimes(CSIDs, callback){
-
-		// console.log(CSIDs);
-
-		var now = new Date();
-
-		var getListingsURL = APIRoot + "/get/times/many/" + CSIDs + "?d=" + now.getDate() + "-" + (now.getMonth() + 1) + "-" + now.getUTCFullYear();
-
-		jQuery.ajax({
-			type : "GET",
-			url : getListingsURL,
-			success : callback,
-			error : function(err){
-				console.log(err);
-				callback(false);
-				loading.hide();
-				dialog.error("Sorry, something went wrong");
-				updateOnlineStatus();
-			},
-			dataType : "json",
-			crossDomain : true,
-			cache : true
-		});
+	function wasResponseGood(response){
 		
-	}
+		return new Promise( function(resolve, reject){
 
-	function searchLocation(input, callback){
-
-		if(input !== undefined && input.latitude === undefined){
-			input = input.toLowerCase();
-		}
-
-		var reqQuery =  input.latitude === undefined ? APIRoot + "/search/cinemas/location/" + input : APIRoot + "/search/cinemas/coordinates/" + input.latitude + "/" + input.longitude;
-
-		jQuery.ajax({
-			type : "GET",
-			url : reqQuery,
-			success : callback,
-			cache: true,
-			error : function(err){
-				console.error(err);
-				loading.hide();
-				dialog.error("Sorry, Something went wrong");
-				updateOnlineStatus();
+			if(response.ok){
+				response.json()
+					.then(function(json){
+						resolve(json);
+					})
+					.catch(function(err){
+						console.log('An error occurred with request', err);
+						reject(err);
+					})
+				;
+			} else {
+				reject(response);
 			}
-		});		
+
+		});
 
 	}
 
-	var lastPress = 0,
-		filterInterval = undefined,
-		lastSearch = undefined;
+	function joinListOfCinemasWithListings(cinemas, times){
 
-	function filterExistingResults(){
+		return cinemas.map(function(cinema){
 
-		clearTimeout(filterInterval);
-
-			var filterables = document.querySelectorAll('[data-movie-title]'),
-				filterTerm = filterResults[0].value.toLowerCase();
-
-			if(filterTerm !== lastSearch){
-				for(var i = 0; i < filterables.length; i += 1){
-					filterables[i].setAttribute('class', '');
-				}	
+			for(var x = 0; x < times.length; x += 1){
+				if(times[x].cinema === cinema.id){
+					cinema.listings = times[x].listings;
+					times.splice(x, 1);
+					return cinema;
+				}
 			}
 
-			lastSearch = filterTerm
-
-			filterInterval = setTimeout(function(){
-
-				//Do the filter thing
-
-				console.log(filterables);
-
-				for(var h = 0; h < filterables.length; h += 1){
-
-					if(filterables[h].getAttribute('data-movie-title').toLowerCase().indexOf(filterTerm) == -1){
-						filterables[h].setAttribute('class', 'dim');
-					} else if(filterTerm.length > 0){
-						filterables[h].setAttribute('class', 'highlight');
-					}
-
-				}
-
-			}, 300);
+		});
 
 	}
 
-	function handleSubmission(searchQuery){
-
-		locationInput[0].blur();
-
-		loading.display();
-		dialog.hide(0);
-		document.getElementById('results').innerHTML = "";
-
-		document.getElementById('helper').setAttribute('class', 'inactive');
-
-		var locationAcquired = function(res){
-
-				console.log(res);
-
-				if(res.length === 0){
-					console.error("Not a valid place name");
-					loading.hide();
-					dialog.error("Sorry, couldn't find that place");
-					return false;
-				}
-
-				console.log(res);
-
-				var cinemas = res.cinemas;
-
-				if(cinemas.length > 10){
-					cinemas.length = 10;
-				} else if(cinemas.length === 0){
-					loading.hide();
-					dialog.error("Sorry, Couldn't find any cinemas");
-				}
-
-				var listings = [],
-					complete = 0;
-				
-				var multiIDs = [];
-
-				for(var c = 0; c < cinemas.length; c += 1){
-					multiIDs.push(cinemas[c].id);
-				}
-
-				getMultipleShowtimes(multiIDs.join(','), function(res){
-					console.log("RES:", res);
-
-					if(res !== false){
-
-						for(var l = 0; l < res.results.length; l += 1){
-							var cinemaDetails = undefined;
-
-							for(var e = 0; e < cinemas.length; e += 1){
-								if(cinemas[e].id === res.results[l].cinema){
-									cinemaDetails = cinemas[e];
-									break;
-								}
-							}
-
-							listings.push({
-								cinema : cinemaDetails,
-								times : res.results[l].listings
-							});
-						
-						}
-
-						displayListings(listings);
-						loading.hide();
-
-					}
-
-				});
-
-
-				if(searchQuery.latitude !== undefined){
-					// Not a position object, it's a string
-					window.history.pushState({}, "CineList | Results", "/?latitude=" + searchQuery.latitude + "&longitude=" + searchQuery.longitude);
-				} else {
-					window.history.pushState({}, "CineList | " + searchQuery, "/?place=" + searchQuery);
-				}
-
-			}
-
-		searchLocation(searchQuery, locationAcquired);
+	function searchForLocation(location){
+		
+		console.log(location);
+		return fetch(APIRoot + '/search/cinemas/location/' + location)
+			.then(function(response){
+				return wasResponseGood(response);
+			})
+			.catch(function(err){
+				console.log('Could not fetch searchForLocation', err);
+			})
+		;
 	
 	}
 
-	function checkForRef(){
-
-		var location = window.location.href,
-			query = location.split('?')[1],
-			params = undefined,
-			parObj = {};
-
-		if(query !== undefined){
-
-			params = query.split('&');
-
-		} else {
-
-			return false;
-
-		}
-
-		for(var g = 0; g < params.length; g += 1){
-
-			var thisParam = params[g].split('=');
-
-			parObj[thisParam[0]] = thisParam[1]
-
-		}
-
-		console.log(parObj);
-
-		if(parObj.place !== undefined){
-			parObj.place = parObj.place.replace(/\//g, "");
-			locationInput[0].value = decodeURIComponent(parObj.place);
-			handleSubmission(parObj.place);
-		} else if(parObj.latitude !== undefined && parObj.longitude !== undefined){
-			handleSubmission({
-				latitude : parObj.latitude,
-				longitude : parObj.longitude
-			});
-		}
-
-		console.log(locationInput[0]);
-
+	function getManyCinemaTimesById(listOfCinemaIDs){
+		return fetch(APIRoot + '/get/times/many/' + listOfCinemaIDs.join(','))
+			.then(function(response){
+				return wasResponseGood(response);
+			})
+			.catch(function(err){
+				console.log('Could not fetch searchForLocation', err);
+			})
+		;
 	}
 
-	function addEvents(){
+	function bindEvents(){
 
-		locationInput.addEventListener('submit', function(e){
-			e.preventDefault();
+		searchForm.addEventListener('submit', function(e){
+			prevent(e);
+			console.time('cinemaTimes');
+			searchForLocation(this[0].value)
+				.then(function(cinemaData){
 
-			var searchQuery = this[0].value;
+					console.log(cinemaData);
 
-			handleSubmission(searchQuery);
-
-		}, true);
-
-		locationInput.addEventListener('focus', function(){
-			document.getElementById('goArrow').setAttribute('class', '');
-		}, true);
-
-		if("geolocation" in navigator){
-
-			geotrigger.addEventListener('click', function(){
-				loading.display();
-				navigator.geolocation.getCurrentPosition(function(position) {
-					handleSubmission({
-						latitude : position.coords.latitude,
-						longitude : position.coords.longitude
+					var cinemaIDs = cinemaData.cinemas.map(function(datum){
+						return datum.id;
 					});
-				}, function(err){
-					console.log(err);
-					loading.hide();
-					dialog.error("Sorry, unable to get your position");
-					updateOnlineStatus();
-				});
 
-			}, false);
-				
-			geotrigger.setAttribute('class', 'active');
+					return getManyCinemaTimesById(cinemaIDs)
+						.then(function(listingsData){
+							return joinListOfCinemasWithListings(cinemaData.cinemas, listingsData.results);
+						})
+						.then(function(cinemasWithTimes){
+							console.log(cinemasWithTimes);
+						})
+					;
 
-		}
-
-		filterResults.addEventListener('submit', function(e){
-			e.preventDefault();
-			filterResults[0].blur();
-			filterExistingResults();
-		});
-
-		filterResults.addEventListener('keyup', function(){
-
-			filterExistingResults();
-
+				})
+			;
 		}, false);
 
-
 	}
 
-	function init(){
-
-		if(initialised){
-			console.error("Cinelist has already been initialised");
-			return false;
-		}
-
-		console.log("Initialised");
-
-		isWindows(function(){
-			document.body.setAttribute('class', 'windows');
-		});
-
-		locationInput = document.getElementById('locationSearch');
-		geotrigger = document.getElementById('geotrigger');
-		filterInput = document.getElementById('filterResults');
-
-		addEvents();
-		checkForRef();
-
-		initialised = true;
-
-		window.addEventListener('online',  updateOnlineStatus);
-		window.addEventListener('offline', updateOnlineStatus);
-
-		detectNetworkStatus();
-
-	}
-
-	return{
-		init : init
-	};
-
-})();
-
-(function(){
-	__cinelist.init();
-})();
+	bindEvents();
+	console.log('Initialised');
+	
+}());
 
