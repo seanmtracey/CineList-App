@@ -310,6 +310,8 @@
 			prevent(e);
 			console.log(e);
 
+			searchForm[0].value = "";
+
 			resetDayOffsetButtons();
 			dayOffsetButtons[0].classList.add('activeDay');
 
