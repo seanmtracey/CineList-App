@@ -260,9 +260,18 @@
 
 				console.log(cinemaData);
 
-				var cinemaIDs = cinemaData.cinemas.map(function(datum){
-					return datum.id;
-				});
+				var cinemaIDs = cinemaData.cinemas.map(function(datum, idx){
+
+						if(idx < 30){
+							return datum.id;
+						} else if(datum.distance < 5){
+							return datum.id;
+						} else {
+							return undefined;
+						}
+						// return datum.id;
+					})
+				;	
 
 				window.__cinelist.working.update('Getting times for ' + location + ' cinemas');
 
