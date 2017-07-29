@@ -46,6 +46,55 @@ var __cinelist = (function(){
 
 	}
 
+	function generateViewFromData(cinemasWithTimes, shouldSort){
+
+		shouldSort = shouldSort || false;
+
+		var timesDocumentFragment = document.createDocumentFragment();
+		var mainCinemaContainer = document.createElement('div');
+
+		cinemasWithTimes.forEach(function(cinema){
+			
+			var cinemaContainer = document.createElement('div');
+			var cinemaTitle = document.createElement('h2');
+			var cinemaDistance = document.createElement('span');
+
+			cinemaTitle.textContent = cinema.name;
+			cinemaDistance.textContent = cinema.distance;
+
+			cinemaContainer.appendChild(cinemaTitle);
+			cinemaContainer.appendChild(cinemaDistance);
+
+			cinema.listings.forEach(function(listing){
+
+				var listingContainer = document.createElement('div');
+				var listingTitle = document.createElement('h3');
+				var listingTimesContainer = document.createElement('ol');
+
+				listingTitle.textContent = listing.title;
+				
+				listing.times.forEach(function(time){
+
+					var timeLi = document.createElement('li');
+					timeLi.textContent = time;
+					listingTimesContainer.appendChild(timeLi);
+
+				});
+
+				listingContainer.appendChild(listingTitle);
+				listingContainer.appendChild(listingTimesContainer);
+				cinemaContainer.appendChild(listingContainer);
+			});
+
+			mainCinemaContainer.appendChild(cinemaContainer);
+
+		});
+
+		timesDocumentFragment.appendChild(mainCinemaContainer);
+		document.body.appendChild(timesDocumentFragment);
+
+	}
+
 	function searchForLocation(location){
 		
 		console.log(location);
@@ -91,6 +140,8 @@ var __cinelist = (function(){
 						})
 						.then(function(cinemasWithTimes){
 							console.log(cinemasWithTimes);
+							generateViewFromData(cinemasWithTimes);
+							console.timeEnd('cinemaTimes');
 						})
 					;
 
