@@ -140,7 +140,7 @@
 
 		offset = offset || 0;
 
-		window.__cinelist.loading.update('Searching for ' + location + ' cinemas...');
+		window.__cinelist.loading.update('Searching for ' + location + ' cinemas');
 		window.__cinelist.loading.show();
 
 		return searchForLocation(location)
@@ -152,7 +152,7 @@
 						return datum.id;
 					});
 
-					window.__cinelist.loading.update('Getting times for ' + location + ' cinemas...');
+					window.__cinelist.loading.update('Getting times for ' + location + ' cinemas');
 					
 					return getManyCinemaTimesById(cinemaIDs, offset)
 						.then(function(listingsData){
@@ -190,10 +190,8 @@
 
 	bindEvents();
 
-	// Use Javascript to replace the day offsets with the days name
-
 	(function(){
-		var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+		var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 		var today = new Date().getDay();
 
 		dayOffsetButtons.forEach(function(offsetBtn){
