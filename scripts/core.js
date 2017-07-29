@@ -7,7 +7,10 @@ var __cinelist = (function(){
 	var prevent = function(e){e.preventDefault();e.stopImmediatePropagation()};
 
 	var searchForm = document.querySelector('#search');
+	var dayOffsetButtons = document.querySelectorAll('.dayoffset *[data-offset]');
 	var timesContainer = document.querySelector('#timesContainer');
+
+	var currentLocation = '';
 
 	function wasResponseGood(response){
 		
@@ -45,6 +48,12 @@ var __cinelist = (function(){
 
 		});
 
+	}
+
+	function resetDayOffsetButtons(){
+		dayOffsetButtons.forEach(function(button){
+			button.classList.remove('activeDay');
+		});
 	}
 
 	function generateViewFromData(cinemasWithTimes, shouldSort){
@@ -113,8 +122,11 @@ var __cinelist = (function(){
 	
 	}
 
-	function getManyCinemaTimesById(listOfCinemaIDs){
-		return fetch(APIRoot + '/get/times/many/' + listOfCinemaIDs.join(','))
+	function getManyCinemaTimesById(listOfCinemaIDs, offset){
+
+		offset = offset || 0;
+
+		return fetch(APIRoot + '/get/times/many/' + listOfCinemaIDs.join(',') + '?day=' + offset)
 			.then(function(response){
 				return wasResponseGood(response);
 			})
@@ -124,12 +136,11 @@ var __cinelist = (function(){
 		;
 	}
 
-	function bindEvents(){
+	function generateViewFromLocation(location, offset){
 
-		searchForm.addEventListener('submit', function(e){
-			prevent(e);
-			console.time('cinemaTimes');
-			searchForLocation(this[0].value)
+		offset = offset || 0;
+
+		return searchForLocation(location)
 				.then(function(cinemaData){
 
 					console.log(cinemaData);
@@ -138,25 +149,80 @@ var __cinelist = (function(){
 						return datum.id;
 					});
 
-					return getManyCinemaTimesById(cinemaIDs)
+					return getManyCinemaTimesById(cinemaIDs, offset)
 						.then(function(listingsData){
 							return joinListOfCinemasWithListings(cinemaData.cinemas, listingsData.results);
-						})
-						.then(function(cinemasWithTimes){
-							console.log(cinemasWithTimes);
-							timesContainer.innerHTML = "";
-							timesContainer.appendChild(generateViewFromData(cinemasWithTimes));
-							console.timeEnd('cinemaTimes');
 						})
 					;
 
 				})
 			;
+
+	}
+
+	function bindEvents(){
+
+		searchForm.addEventListener('submit', function(e){
+			prevent(e);
+			
+			currentLocation = this[0].value;
+			resetDayOffsetButtons();
+			dayOffsetButtons[0].classList.add('activeDay');
+
+			generateViewFromLocation(currentLocation, 0)
+				.then(function(cinemasWithTimes){
+					console.log(cinemasWithTimes);
+					timesContainer.innerHTML = "";
+					timesContainer.appendChild(generateViewFromData(cinemasWithTimes));
+				})
+			;
+
 		}, false);
 
 	}
 
 	bindEvents();
+
+	// Use Javascript to replace the day offsets with the days name
+
+	(function(){
+		var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+		var today = new Date().getDay();
+
+		dayOffsetButtons.forEach(function(offsetBtn){
+
+			var dayInt = parseInt(offsetBtn.dataset.offset) + today;
+			
+			if(dayInt >= days.length){
+				dayInt = dayInt - 7;
+			}
+			
+			offsetBtn.textContent = days[dayInt];
+
+			offsetBtn.addEventListener('click', function(e){
+				prevent(e);
+
+				resetDayOffsetButtons();
+
+				offsetBtn.classList.add('activeDay');
+				
+				console.log(parseInt(this.dataset.offset));
+
+				generateViewFromLocation(currentLocation, parseInt(this.dataset.offset))
+					.then(function(cinemasWithTimes){
+						console.log(cinemasWithTimes);
+						timesContainer.innerHTML = "";
+						timesContainer.appendChild(generateViewFromData(cinemasWithTimes));
+					})
+				;
+
+			}, false);
+
+		});
+
+	})();
+
+
 	console.log('Initialised');
 	
 }());
