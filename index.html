@@ -24,7 +24,7 @@
 
 	<link rel="manifest" href="/manifest.json">
 	<meta name="theme-color" content="#000000" />
-
+	<script>window.__cinelist = {};</script>
 </head>
 	<body>
 
@@ -42,6 +42,37 @@
 			<a href="#" data-offset='4'>&plus;4</a>
 			<a href="#" data-offset='5'>&plus;5</a>
 			<a href="#" data-offset='6'>&plus;6</a>
+		</div>
+
+		<div class="loading" data-visible="false">
+			<img src="/assets/images/loading.png" class="spin" alt="loading spinner"/>
+			<div class="status">Well, hello there...</div>
+
+			<script>
+				window.__cinelist.loading = (function(){
+					
+					var spinnerOverlay = document.querySelector('.loading');
+					var statusMessage = spinnerOverlay.querySelector('.status');
+
+					function showSpinner(){
+						spinnerOverlay.dataset.visible = "true";
+					}
+
+					function hideSpinner(){
+						spinnerOverlay.dataset.visible = "false";
+					}
+
+					function updateSpinnerMessage(message){
+						statusMessage.textContent = message;
+					}
+
+					return {
+						show : showSpinner,
+						hide : hideSpinner,
+						update : updateSpinnerMessage
+					};
+				}());
+			</script>
 		</div>
 
 		<script src="/scripts/core.js"></script>

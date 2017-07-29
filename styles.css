@@ -9,16 +9,28 @@
 	/*-webkit-backface-visibility: hidden;*/
 }
 
-.inactive, [data-is-loading=false]{
+.inactive, [data-is-loading=false], [data-visible=false]{
 	display: none !important;
 }
 
-.dim{
-	opacity: 0.2;
+.loading{
+	position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    flex-direction: column;
+    text-align: center;
+    height: 100%;
+    z-index: 999;
+    background: rgba(255,255,255,.9);
 }
 
-.highlight{
-	opacity: 1 !important;
+.loading img{
+	width: 50px;
+	height: 50px;
 }
 
 h1,h2,h3,h4,h5,h6{
@@ -49,6 +61,14 @@ body{
 	box-sizing:border-box;
 }
 
+#search{
+	width: 100%;
+	position: fixed;
+	top: 0;
+	z-index: 1000;
+	background: white;
+}
+
 form{
 	padding: 1em;
 }
@@ -61,6 +81,11 @@ form input[type="text"]{
 	border-width: 0 0 1px 0;
 	outline: none;
 	width: 100%;
+}
+
+#timesContainer{
+    padding-top: 70px;
+    padding-bottom: 30%;
 }
 
 #timesContainer h2{
@@ -95,7 +120,14 @@ form input[type="text"]{
 #timesContainer .listing ol li{
 	display: block;
 	width: 50px;
-	margin-bottom: 1em;
+	margin-bottom: 0.5em;
+	padding: 0.5em;
+}
+
+#timesContainer .listing ol li.nextTime{
+	background: black;
+	color: white;
+	border-radius: 3px;
 }
 
 .dayoffset{
@@ -109,6 +141,7 @@ form input[type="text"]{
 	border-top: 1px solid black;
 	align-items: center;
 	background: white;
+	z-index: 1000;
 }
 
 .dayoffset a{
@@ -117,7 +150,7 @@ form input[type="text"]{
 	margin-right: 2em;
 	text-decoration: none;
 	font-weight: 200;
-padding: 0.4em 0.7em;
+	padding: 0.4em 0.7em;
 }
 
 .dayoffset a.activeDay{
@@ -125,4 +158,31 @@ padding: 0.4em 0.7em;
     color: white;
     border-radius: 3px;
 	font-weight: 600;
+}
+
+.spin{
+	animation: spinAnimation 1.25s infinite;
+	-moz-animation: spinAnimation 1.25s infinite;
+	-webkit-animation: spinAnimation 1.25s infinite;
+	-o-animation: spinAnimation 1.25s infinite;
+}
+
+@keyframes spinAnimation{
+	0% {transform: rotateZ(0deg);}
+	100% {transform: rotateZ(360deg);}
+}
+
+@-moz-keyframes spinAnimation{
+	0% {-moz-transform: rotateZ(0deg);}
+	100% {-moz-transform: rotateZ(360deg);}
+}
+	
+@-webkit-keyframes spinAnimation{
+	0% {-webkit-transform: rotateZ(0deg);}
+	100% {-webkit-transform: rotateZ(360deg);}
+}
+	
+@-o-keyframes spinAnimation{
+	0% {-o-transform: rotateZ(0deg);}
+	100% {-o-transform: rotateZ(360deg);}
 }

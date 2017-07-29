@@ -1,4 +1,4 @@
-var __cinelist = (function(){
+(function(){
 
 	'use strict';
 
@@ -140,6 +140,9 @@ var __cinelist = (function(){
 
 		offset = offset || 0;
 
+		window.__cinelist.loading.update('Searching for ' + location + ' cinemas...');
+		window.__cinelist.loading.show();
+
 		return searchForLocation(location)
 				.then(function(cinemaData){
 
@@ -149,6 +152,8 @@ var __cinelist = (function(){
 						return datum.id;
 					});
 
+					window.__cinelist.loading.update('Getting times for ' + location + ' cinemas...');
+					
 					return getManyCinemaTimesById(cinemaIDs, offset)
 						.then(function(listingsData){
 							return joinListOfCinemasWithListings(cinemaData.cinemas, listingsData.results);
@@ -174,6 +179,8 @@ var __cinelist = (function(){
 					console.log(cinemasWithTimes);
 					timesContainer.innerHTML = "";
 					timesContainer.appendChild(generateViewFromData(cinemasWithTimes));
+					window.__cinelist.loading.hide();
+					
 				})
 			;
 
@@ -213,6 +220,7 @@ var __cinelist = (function(){
 						console.log(cinemasWithTimes);
 						timesContainer.innerHTML = "";
 						timesContainer.appendChild(generateViewFromData(cinemasWithTimes));
+						window.__cinelist.loading.hide();						
 					})
 				;
 
