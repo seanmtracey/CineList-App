@@ -14,6 +14,7 @@ self.addEventListener('install', function(e) {
 			'/scripts/core.js',
 			'/scripts/libraries/jquery.min.js',
 			'/assets/images/loading.png',
+			'/assets/images/error.png',
 			'/service-worker.js',
 			'/assets/images/search.png',
 			'/assets/images/geo.png',
@@ -30,26 +31,27 @@ self.addEventListener('fetch', function(event) {
 		var fetchPromise = fetch(event.request).then(function(networkResponse) {
 		  cache.put(event.request, networkResponse.clone());
 		  return networkResponse;
-		})
-				console.log(cachedResponse);
-				// If it's a request to the API
-				// try to get it from the network
-				// if that fails, send the cached version
-				// if there is one. 	
-				if(event.request.url.indexOf('api.cinelist.co.uk') > -1){
+		});
+		
+		console.log(cachedResponse);
+		// If it's a request to the API
+		// try to get it from the network
+		// if that fails, send the cached version
+		// if there is one. 	
+		if(event.request.url.indexOf('api.cinelist.co.uk') > -1){
 
-					return fetchPromise
-						.catch(function(err){
-							if(cachedResponse !== undefined){
-								return cachedResponse;
-							} else {
-								throw err;
-							}
-						})
-					;
-				}
+			return fetchPromise
+				.catch(function(err){
+					if(cachedResponse !== undefined){
+						return cachedResponse;
+					} else {
+						throw err;
+					}
+				})
+			;
+		}
 
-				return cachedResponse || fetchPromise;
+		return cachedResponse || fetchPromise;
 
 	  })
 	})

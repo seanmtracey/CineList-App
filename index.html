@@ -56,22 +56,38 @@
 			<a href="#" data-offset='6'>&plus;6</a>
 		</div>
 
-		<div class="loading" data-visible="false">
-			<img src="/assets/images/loading.png" class="spin" alt="loading spinner"/>
+		<div class="working" data-visible="false">
+			<img src="/assets/images/error.png" id="error" data-visible="false" alt="Cross"/>
+			<img src="/assets/images/loading.png" id="loading" data-visible="true" class="spin" alt="loading spinner"/>
 			<div class="status">Well, hello there...</div>
 
 			<script>
-				window.__cinelist.loading = (function(){
+				window.__cinelist.working = (function(){
 					
-					var spinnerOverlay = document.querySelector('.loading');
-					var statusMessage = spinnerOverlay.querySelector('.status');
+					var workingOverlay = document.querySelector('.working');
+					var spinnerImage = workingOverlay.querySelector('#loading');
+					var errorImage = workingOverlay.querySelector('#error');					
+					var statusMessage = workingOverlay.querySelector('.status');
 
+					function selectIcon(icon){
+						if(icon === 'error'){
+							spinnerImage.dataset.visible = "false";
+							errorImage.dataset.visible = "true";
+						}
+
+						if(icon === 'working'){
+							spinnerImage.dataset.visible = "true";
+							errorImage.dataset.visible = "false";
+						}
+
+					}
+					
 					function showSpinner(){
-						spinnerOverlay.dataset.visible = "true";
+						workingOverlay.dataset.visible = "true";
 					}
 
 					function hideSpinner(){
-						spinnerOverlay.dataset.visible = "false";
+						workingOverlay.dataset.visible = "false";
 					}
 
 					function updateSpinnerMessage(message){
@@ -79,9 +95,10 @@
 					}
 
 					return {
+						icon : selectIcon,
 						show : showSpinner,
 						hide : hideSpinner,
-						update : updateSpinnerMessage
+						update : updateSpinnerMessage,
 					};
 				}());
 			</script>
