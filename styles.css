@@ -88,6 +88,16 @@ form input[type="text"]{
 	width: 100%;
 }
 
+#geolocation{
+	color: #0279cd;
+	font-weight: 600;
+	text-decoration: none;
+	margin-top: 0.5em;
+	display: block;
+	padding: 0 0.3em 0;
+	cursor: pointer;
+}
+
 #timesContainer{
     padding-top: 70px;
     padding-bottom: 30%;
