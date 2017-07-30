@@ -198,6 +198,7 @@ form#search input[type="submit"]{
     display: flex;
     list-style-type: none;
     flex-wrap: wrap;
+	-webkit-flex-wrap: wrap;
     padding-top: 0.8em;
     padding-bottom: 1em;
 }
@@ -293,6 +294,7 @@ form#search input[type="submit"]{
 	#timesContainer .cinema{
 		display: -webkit-flex;
 		display: flex;
+		-webkit-flex-wrap: wrap;
 		flex-wrap: wrap;
 	}
 
