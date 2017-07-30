@@ -84,7 +84,7 @@ body{
     margin-bottom: 0.5em;
 }
 
-#home #container h3{
+#home #container h1{
 	font-weight: 400;
 	font-size: 15px;
 	padding-left: 4px;
@@ -133,13 +133,15 @@ form#search input[type="text"]:focus{
 }
 
 form#search input[type="submit"]{
-	position: absolute;
+    position: absolute;
     right: 0;
     background: transparent;
     border: 0px solid transparent;
     width: 60px;
     height: 100%;
-	outline: none;
+    outline: none;
+    font-size: 0px;
+    color: transparent;
 }
 
 #geolocation{
