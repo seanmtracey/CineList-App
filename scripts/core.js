@@ -261,7 +261,6 @@
 				console.log(cinemaData);
 
 				var cinemaIDs = cinemaData.cinemas.map(function(datum, idx){
-
 						if(idx < 30){
 							return datum.id;
 						} else if(datum.distance < 5){
@@ -269,9 +268,8 @@
 						} else {
 							return undefined;
 						}
-						// return datum.id;
 					})
-				;	
+				;
 
 				window.__cinelist.working.update('Getting times for ' + location + ' cinemas');
 
@@ -338,6 +336,40 @@
 
 	}
 
+	function locationSubmitted(location){
+
+		home.dataset.visible = "false";
+		searchForm.dataset.firstload = "false";
+		
+		currentLocation = location;
+		currentLocationIsPostcode = false;
+
+		resetDayOffsetButtons();
+		dayOffsetButtons[0].classList.add('activeDay');
+		dayoffsetContainer.dataset.active = "false";
+
+		getCinemasAndTimesFromLocation(currentLocation, 0)
+			.then(function(cinemasWithTimes){
+				console.log(cinemasWithTimes);
+				timesContainer.innerHTML = "";
+				timesContainer.appendChild(generateViewFromData(cinemasWithTimes, 0));
+				window.__cinelist.working.hide();
+				dayoffsetContainer.dataset.active = "true";
+			})
+			.catch(function(err){
+
+				window.__cinelist.working.icon('error');
+				window.__cinelist.working.update('Sorry - something went wrong getting your times');
+
+				setTimeout(function(){
+					window.__cinelist.working.hide();
+				}, 4000);
+
+			})
+		;
+
+	}
+
 	function bindEvents(){
 
 		searchForm.addEventListener('submit', function(e){
@@ -349,34 +381,10 @@
 
 			this[0].blur();
 			this.dataset.firstload = "false";
-			home.dataset.visible = "false";
 
-			currentLocation = this[0].value;
-			currentLocationIsPostcode = false;
+			window.history.pushState({}, 'CineList | ' + this[0].value, '?place=' + this[0].value);
 
-			resetDayOffsetButtons();
-			dayOffsetButtons[0].classList.add('activeDay');
-			dayoffsetContainer.dataset.active = "false";
-
-			getCinemasAndTimesFromLocation(currentLocation, 0)
-				.then(function(cinemasWithTimes){
-					console.log(cinemasWithTimes);
-					timesContainer.innerHTML = "";
-					timesContainer.appendChild(generateViewFromData(cinemasWithTimes, 0));
-					window.__cinelist.working.hide();
-					dayoffsetContainer.dataset.active = "true";
-				})
-				.catch(function(err){
-
-					window.__cinelist.working.icon('error');
-					window.__cinelist.working.update('Sorry - something went wrong getting your times');
-
-					setTimeout(function(){
-						window.__cinelist.working.hide();
-					}, 4000);
-
-				})
-			;
+			locationSubmitted(this[0].value);
 
 		}, false);
 
@@ -493,6 +501,24 @@
 
 	})();
 
+	(function(){
+
+		var queryString = window.location.search;
+		var queryParameters = {};
+
+		queryString.slice(1).split('&').forEach( function(keyPair){
+			var split = keyPair.split('=');
+			queryParameters[split[0]] = split[1];
+		});
+
+		console.log(queryParameters);
+
+		if(queryParameters.place !== undefined){
+			searchForm[0].value = decodeURIComponent( queryParameters.place.replace('/', '') );
+			locationSubmitted(queryParameters.place);
+		}
+
+	})();
 
 	console.log('Initialised');
 
