@@ -4,9 +4,6 @@
 *{
 	-webkit-tap-highlight-color: rgba(0,0,0,0);
 	box-sizing: border-box;
-	/*-webkit-transform: translateZ(0);*/
-	/*-webkit-perspective: 1000;*/
-	/*-webkit-backface-visibility: hidden;*/
 }
 
 .inactive, [data-is-loading=false], [data-visible=false]{
@@ -17,11 +14,15 @@
 	position: fixed;
     top: 0;
     left: 0;
+	display: -webkit-flex;
     display: flex;
+	-webkit-align-items: center;
     align-items: center;
+	-webkit-justify-content: center;
     justify-content: center;
     width: 100%;
-    flex-direction: column;
+    -webkit-flex-direction: column;
+	flex-direction: column;
     text-align: center;
     height: 100%;
     z-index: 999;
@@ -91,8 +92,11 @@ body{
 }
 
 #search{
+	display: -webkit-flex;
 	display: flex;
+	-webkit-align-items: center;
 	align-items: center;
+	-webkit-justify-content: space-between;
 	justify-content: space-between;
 	width: 100%;
 	position: fixed;
@@ -167,7 +171,9 @@ form#search input[type="submit"]{
 
 #timesContainer h2{
 	font-size: 18px;
+	display: -webkit-flex;
 	display: flex;
+	-webkit-align-items: center;
 	align-items: center;
 	padding: 0.5em;
 	background: black;
@@ -188,6 +194,7 @@ form#search input[type="submit"]{
 #timesContainer .listing ol{
     padding: 0;
     margin: 0;
+	display: -webkit-flex;
     display: flex;
     list-style-type: none;
     flex-wrap: wrap;
@@ -220,11 +227,13 @@ form#search input[type="submit"]{
 	position: fixed;
 	bottom: 0;
 	left: 0;
+	display: -webkit-flex;
 	display: flex;
 	width: 100%;
 	overflow-x: scroll;
 	padding: 0.8em;
 	border-top: 1px solid black;
+	-webkit-align-items: center;
 	align-items: center;
 	background: white;
 	z-index: 1000;
@@ -248,6 +257,7 @@ form#search input[type="submit"]{
 }
 
 .dayoffset[data-active="false"]{
+	-webkit-transform: translateY(60px);
 	transform: translateY(100%);
 }
 
@@ -281,6 +291,7 @@ form#search input[type="submit"]{
 @media all and (min-width: 768px){
 	
 	#timesContainer .cinema{
+		display: -webkit-flex;
 		display: flex;
 		flex-wrap: wrap;
 	}
