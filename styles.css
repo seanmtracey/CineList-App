@@ -239,15 +239,18 @@ form#search input[type="submit"]{
 	background: white;
 	z-index: 1000;
 	transition: transform 0.2s ease-out;
+	-webkit-overflow-scrolling: touch;
 }
 
 .dayoffset a{
 	display: block;
 	color: #3a3a3a;
-	margin-right: 2em;
+	margin-right: 1em;
 	text-decoration: none;
 	font-weight: 200;
 	padding: 0.4em 0.7em;
+	min-width: 100px;
+	text-align: center;
 }
 
 .dayoffset a.activeDay{
