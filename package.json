@@ -1,0 +1,25 @@
+{
+  "name": "cinelist-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "The PWA for CineList.co.uk",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/seanmtracey/CineList-App.git"
+  },
+  "author": "Sean M. Tracey",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/seanmtracey/CineList-App/issues"
+  },
+  "homepage": "https://github.com/seanmtracey/CineList-App#readme",
+  "dependencies": {
+    "dotenv": "^6.0.0",
+    "node-static": "^0.7.10"
+  }
+}
